@@ -5,7 +5,7 @@ function logger(req, res, next) {
   const timestamp = new Date().toLocaleString();
   const method = req.method
   const url = req.originalUrl
-  console.log(`[${timestamp} ${method} ${url}]`)
+  console.log(`${timestamp} ${method} ${url}`)
   next()
 }
 
@@ -23,34 +23,48 @@ async function validateUserId(req, res, next) {
     }
   } catch(err){
     res.status(500).json({
-      message: 'Error finding user'
+      message: 'unable to find user'
     })
   }
 }
 
 function validateUser(req, res, next) {
   // DO YOUR MAGIC
-  const {name}= req.body
-  if(!name){
+  try{
+    const {name}= req.body
+  if(!name || !name.trim()){
     res.status(400).json({
       message: 'missing required name field'
     })
   } else {
+    req.name = name.trim()
     next()
   }
-  
+  } catch(err){
+    res.status(500).json({
+      message:"unable to find user"
+    })
+  }
 }
 
 function validatePost(req, res, next) {
   // DO YOUR MAGIC
   const { text }= req.body;
-  if(!text){
-    res.status(400).json({
-      message: 'missing required text field'
+  try{
+    if(!text || !text.trim()){
+      res.status(400).json({
+        message: 'missing required text field'
+      })
+    } else{
+      req.text = text.trim()
+      next()
+    }
+  }catch(err){
+    res.status(500).json({
+      message:"unable to find post"
     })
-  } else{
-    next()
   }
+  
 }
 
 // do not forget to expose these functions to other modules
