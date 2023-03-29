@@ -15,7 +15,7 @@ async function validateUserId(req, res, next) {
     const user = await Users.getById(req.params.id)
     if(!user){
       res.status(404).json({
-        message:'no such user'
+        message:'user not found'
       })
     } else {
       req.user = user
@@ -46,7 +46,7 @@ function validatePost(req, res, next) {
   const { text }= req.body;
   if(!text){
     res.status(400).json({
-      message: 'missing text required'
+      message: 'missing required text field'
     })
   } else{
     next()

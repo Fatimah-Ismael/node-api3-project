@@ -5,29 +5,23 @@ const { validateUserId,
 
 // You will need `users-model.js` and `posts-model.js` both
 // The middleware functions also need to be required
-
+const Users = require('./users-model')
+const Post = require('../posts/posts-model')
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  /*Users.get(req.query)
+router.get('/', (req, res, next) => {
+  Users.get(req.query)
   .then(users =>{
-  res.status(200).json(users)
+  res.json(users)
   })
-  .catch(error => {
-    // log error to server
-    console.log(error);
-    res.status(500).json({
-      message: 'Error getting users',
+  .catch(next)
     });
-  }); */
   // RETURN AN ARRAY WITH ALL THE USERS
-});
 
-router.get('/:id', validateUserId, (req, res) => {
-  
+router.get('/:id', validateUserId, (req, res, next) => {
+  res.json(req.user)
     console.log(req.user)
-  // RETURN THE USER OBJECT
-  // this needs a middleware to verify user id
+  
 });
 
 router.post('/', validateUser, (req, res) => {
@@ -37,12 +31,14 @@ router.post('/', validateUser, (req, res) => {
 });
 
 router.put('/:id', validateUserId, validateUser,(req, res) => {
+  Users.update(req.params.id, req.body)
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
 });
 
-router.delete('/:id', validateUserId,  (req, res) => {
+router.delete('/:id', validateUserId,  (req, res, next) => {
+  Users.remove(req.params.id)
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
 });
@@ -59,6 +55,11 @@ router.post('/:id/posts', validateUserId,validatePost, (req, res) => {
   console.log(req.user)
   console.log(req.text)
 });
-
+router.use((err, req, res, next)=>{ //eslint-disable-line
+  res.status(err.status || 500).json({
+    customMessage: 'Error error error',
+    message:err.message,
+  })
+})
 // do not forget to export the router
 module.exports = router
